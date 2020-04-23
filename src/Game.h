@@ -13,8 +13,9 @@ public:
     GLuint Width, Height;
     Game(GLuint width, GLuint height);
     void Init();
-    void ProcessInput(GLfloat dt);
+    void ProcessInput(GLfloat delta);
     void Update();
+    void Fixed_Update(GLfloat delta);
 
     void Render();
 };

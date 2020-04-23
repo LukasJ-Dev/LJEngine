@@ -15,7 +15,7 @@ WindowHandler::WindowHandler(GLuint width, GLuint height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    window = glfwCreateWindow(width,height, "Flappy", nullptr, nullptr);
+    window = glfwCreateWindow(width,height, "LJEngine 0.0.1", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
 }

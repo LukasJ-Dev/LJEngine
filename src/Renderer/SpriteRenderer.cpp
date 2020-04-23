@@ -2,6 +2,7 @@
 // Created by Lukas on 2020-04-18.
 //
 
+#include <iostream>
 #include "SpriteRenderer.h"
 
 SpriteRenderer::SpriteRenderer(Shader &shader)
@@ -15,7 +16,7 @@ SpriteRenderer::~SpriteRenderer()
     glDeleteVertexArrays(1, &this->quadVAO);
 }
 
-void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 position, glm::vec2 size, GLfloat rotate, glm::vec3 color)
+void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 position, glm::vec2 scale, GLfloat rotate, glm::vec3 color)
 {
     // Prepare transformations
     this->shader.Use();
@@ -25,16 +26,18 @@ void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 position, glm::vec2 
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
     };
-    model = glm::translate(model, glm::vec3(position, 0.0f));  // First translate (transformations are: scale happens first, then rotation and then finall translation happens; reversed order)
-
     glm::vec2 spriteSize = glm::vec2(
-            0.5f * size.x * texture.Width,
-            0.5*size.y * texture.Height
-            );
+            0.5f * scale.x * texture.Width,
+            0.5*scale.y * texture.Height
+    );
+    model = glm::translate(model, glm::vec3(position-(spriteSize*0.5f), 0.0f)); // Move origin back
+    //model = glm::translate(model, glm::vec3(position, 0.0f));  // First translate (transformations are: scale happens first, then rotation and then finall translation happens; reversed order)
 
-    model = glm::translate(model, glm::vec3(spriteSize.x, spriteSize.y, 0.0f)); // Move origin of rotation to center of quad
+
+
+    model = glm::translate(model, glm::vec3(spriteSize * 0.5f, 0.0f)); // Move origin of rotation to center of quad
     model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 1.0f)); // Then rotate
-    model = glm::translate(model, glm::vec3(-spriteSize.x, -spriteSize.y, 0.0f)); // Move origin back
+    model = glm::translate(model, glm::vec3(-spriteSize * 0.5f, 0.0f)); // Move origin back
 
     model = glm::scale(model, glm::vec3(spriteSize, 1.0f)); // Last scale
 

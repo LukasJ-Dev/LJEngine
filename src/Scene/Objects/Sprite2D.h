@@ -20,7 +20,7 @@ private:
     glm::vec3 Color;
 
 public:
-    Sprite2D(Texture &texture, glm::vec2 position, glm::vec2 size, GLfloat rotation, glm::vec3 color = glm::vec3(1.0f));
+    Sprite2D(Texture &texture, glm::vec2 position, glm::vec2 scale, GLfloat rotation, glm::vec3 color = glm::vec3(1.0f));
     ~Sprite2D();
     void Render(SpriteRenderer &renderer);
     void setSprite(Texture &sprite);

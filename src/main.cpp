@@ -40,11 +40,13 @@ int main() {
         lastFrame = currentFrame;
         glfwPollEvents();
 
-        //gameEngine.ProcessInput(deltaTime);
+        gameEngine.ProcessInput(deltaTime);
 
-        //gameEngine.Update();
+        gameEngine.Fixed_Update(deltaTime);
 
-        glClearColor(0.4f, 0.5f, 0.3f, 1.0f);
+        gameEngine.Update();
+
+        glClearColor(0.0f, 0.9f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         gameEngine.Render();
 
