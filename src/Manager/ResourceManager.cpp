@@ -13,9 +13,9 @@
 std::map<std::string, Texture> ResourceManager::Sprites;
 std::map<std::string, Shader> ResourceManager::Shaders;
 
-Texture ResourceManager::LoadTexture(const GLchar *file, GLboolean alpha, std::string name)
+Texture ResourceManager::LoadTexture(std::string filePath, GLboolean alpha, std::string name)
 {
-    Sprites[name] = loadTextureFromFile(file, alpha);
+    Sprites[name] = loadTextureFromFile(filePath.c_str(), alpha);
     return Sprites[name];
 }
 

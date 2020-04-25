@@ -33,10 +33,8 @@ void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 position, glm::vec2 
     model = glm::translate(model, glm::vec3(position-(spriteSize*0.5f), 0.0f)); // Move origin back
     //model = glm::translate(model, glm::vec3(position, 0.0f));  // First translate (transformations are: scale happens first, then rotation and then finall translation happens; reversed order)
 
-
-
     model = glm::translate(model, glm::vec3(spriteSize * 0.5f, 0.0f)); // Move origin of rotation to center of quad
-    model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 1.0f)); // Then rotate
+    model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f)); // Then rotate
     model = glm::translate(model, glm::vec3(-spriteSize * 0.5f, 0.0f)); // Move origin back
 
     model = glm::scale(model, glm::vec3(spriteSize, 1.0f)); // Last scale

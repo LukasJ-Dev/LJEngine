@@ -21,7 +21,7 @@ public:
 
     static Shader GetShader(std::string name);
 
-    static Texture LoadTexture(const GLchar *file, GLboolean alpha, std::string name);
+    static Texture LoadTexture(std::string file, GLboolean alpha, std::string name);
 
     static Texture GetTexture(std::string name);
 private:

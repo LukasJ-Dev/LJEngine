@@ -46,7 +46,7 @@ void Scene::addToSceneCollision(Collision *collision) {
 void Scene::CheckCollision() {
     for(int i = 0; i < sceneCollisions.size(); i++) {
         for(int c = i+1; c < sceneCollisions.size(); c++) {
-            std::cout << sceneCollisions[i]->collideWith(sceneCollisions[c]) << std::endl;
+            //std::cout << sceneCollisions[i]->collideWith(sceneCollisions[c]) << std::endl;
 
 
         }
