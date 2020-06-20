@@ -1,6 +1,8 @@
 #define GLEW_STATIC
 #include "gl/glew.h"
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include "Manager/KeyHandler.h"
 #include "Display/WindowHandler.h"
 #include "Game.h"
 
@@ -58,7 +60,12 @@ int main() {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+    KeyHandler::setKeyPressed(key);
+    if(action == GLFW_RELEASE) {
+        KeyHandler::ReleaseKey();
     }
 }

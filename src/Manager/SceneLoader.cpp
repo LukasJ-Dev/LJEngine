@@ -2,10 +2,13 @@
 // Created by Lukas on 2020-04-23.
 //
 #include "SceneLoader.h"
+#include <Game.h>
 
 Camera *camera;
 
-Scene* SceneLoader::loadScene(std::string scenePath) {
+std::vector<lua_State*> lStates;
+
+Scene* SceneLoader::loadScene(std::string scenePath, Game *game) {
     std::ifstream i(scenePath);
     json j;
     i >> j;
@@ -17,26 +20,20 @@ Scene* SceneLoader::loadScene(std::string scenePath) {
             glm::vec2(j["root"]["Scale"][0],j["root"]["Scale"][1]),j["root"]["Rotation"]);
 
     Scene* world = new Scene(*rootObject);
-    checkObjects(j["root"]["children"], rootObject);
+    checkObjects(j["root"]["children"], rootObject, game);
     return world;
 }
 
-void SceneLoader::checkObjects(json j, GameObject* parent) {
+void SceneLoader::checkObjects(json j, GameObject* parent, Game *game) {
 
     for(int i = 0; i < j.size(); i++) {
         GameObject *object;
-        std::cout << j.at(i)["GameObjectType"] << std::endl;
-        if (j.at(i)["GameObjectType"] == "GameObject") {
-            object = new GameObject(
-                    glm::vec2(j.at(i)["Position"][0],j.at(i)["Position"][1]),
-                    glm::vec2(j.at(i)["Scale"][0],j.at(i)["Scale"][1]),j.at(i)["Rotation"]);
-        }
-        else if (j.at(i)["GameObjectType"] == "Sprite2D") {
+
+        if (j.at(i)["GameObjectType"] == "Sprite2D") {
             object = new Sprite2D(ResourceManager::GetTexture(j.at(i)["sprite"]),
                     glm::vec2(j.at(i)["Position"][0],j.at(i)["Position"][1]),
                     glm::vec2(j.at(i)["Scale"][0],j.at(i)["Scale"][1]),j.at(i)["Rotation"]);
         }
-
         else if (j.at(i)["GameObjectType"] == "Camera") {
             object = new Camera(
                     glm::vec2(j.at(i)["Position"][0],j.at(i)["Position"][1]),
@@ -49,27 +46,58 @@ void SceneLoader::checkObjects(json j, GameObject* parent) {
                     glm::vec2(j.at(i)["Position"][0],j.at(i)["Position"][1]),
                     glm::vec2(j.at(i)["Scale"][0],j.at(i)["Scale"][1]),j.at(i)["Rotation"]);
         }
+        else {
+            object = new GameObject(
+                    glm::vec2(j.at(i)["Position"][0],j.at(i)["Position"][1]),
+                    glm::vec2(j.at(i)["Scale"][0],j.at(i)["Scale"][1]),j.at(i)["Rotation"]);
+        }
 
-        std::cout << "Pos: ";
-        std::cout << j.at(i)["Position"][0];
-        std::cout << ", ";
-        std::cout << j.at(i)["Position"][1] << std::endl;
+        GameObject* objectPointer = parent->attachChild(object);
 
-        std::cout << "Scale: ";
-        std::cout << j.at(i)["Scale"][0];
-        std::cout << ", ";
-        std::cout << j.at(i)["Scale"][1] << std::endl;
+        if(j.at(i)["Script"] != nullptr) {
+            std::cout << "Hello World" << std::endl;
+            lStates.push_back(luaL_newstate());
+            luaL_openlibs(lStates.back());
 
-        std::cout << "Rotation: ";
-        std::cout << j.at(i)["Rotation"] << std::endl;
+            //TEMP
+            luaL_newmetatable(lStates.back(), "ObjectMetaTable");
+            lua_pushstring(lStates.back(), "__index");
+            lua_pushlightuserdata(lStates.back(), objectPointer);
+            lua_pushcclosure(lStates.back(), LuaReflection::getPositionR, 1);
+            lua_settable(lStates.back(), -3);
 
-        parent->attachChild(object);
+            lua_pushstring(lStates.back(), "__newindex");
+            lua_pushlightuserdata(lStates.back(), objectPointer);
+            lua_pushcclosure(lStates.back(), LuaReflection::setPositionR, 1);
+            lua_settable(lStates.back(), -3);
+
+            lua_getglobal(lStates.back(), "position");
+            luaL_getmetatable(lStates.back(), "ObjectMetaTable");
+            lua_setmetatable(lStates.back(), -2);
+
+            lua_newtable(lStates.back());
+            lua_pushvalue(lStates.back(), lua_gettop(lStates.back()));
+            lua_setglobal(lStates.back(), "Input");
+            lua_pushcfunction(lStates.back(), LuaReflection::HandleInputR);
+            lua_setfield(lStates.back(), -2, "isKeyDown");
+
+            //TEMP
+            std::string scriptName = j.at(i)["Script"];
+            std::string scriptPath = game->getGamePath() + "scripts/" + scriptName;
+            luaL_dofile(lStates.back(), scriptPath.c_str());
+        }
+
+
         if(j.at(i)["children"].size() > 0){
-            checkObjects(j.at(i)["children"], object);
+            checkObjects(j.at(i)["children"], object, game);
         }
     }
 }
 
 Camera* SceneLoader::getCamera() {
     return camera;
+}
+
+std::vector<lua_State*> SceneLoader::getState() {
+    return lStates;
 }

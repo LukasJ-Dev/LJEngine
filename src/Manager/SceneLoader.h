@@ -14,15 +14,19 @@
 #include "Scene/Scene.h"
 #include "Scene/Objects/RigidBody.h"
 #include "ResourceManager.h"
+#include "Manager/ScriptManager/LuaReflection.h"
+
+struct Game;
 
 using json = nlohmann::json;
 
 class SceneLoader {
 private:
-    static void checkObjects(json j, GameObject* parent);
+    static void checkObjects(json j, GameObject* parent, Game *game);
 public:
     static Camera* getCamera();
-    static Scene* loadScene(std::string scenePath);
+    static Scene* loadScene(std::string scenePath, Game* game);
+    static std::vector<lua_State*> getState();
 };
 
 

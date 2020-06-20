@@ -23,7 +23,7 @@ public:
 
     GLfloat Rotation;
 
-    void attachChild(GameObject *child);
+    GameObject* attachChild(GameObject *child);
 
     void setScene(Scene *scene);
 

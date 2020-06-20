@@ -5,6 +5,7 @@
 #include <Scene/Objects/RigidBody.h>
 #include <iostream>
 #include <Manager/SceneLoader.h>
+#include "Manager/ScriptManager/LuaReflection.h"
 #include "Game.h"
 #include "Manager/ResourceManager.h"
 #include "Scene/Scene.h"
@@ -16,11 +17,15 @@ SpriteRenderer *spriteRenderer;
 
 glm::mat4 projection;
 
-std::string gamePath = "Games/testGame/";
+std::vector<lua_State*> lState;
 
 Game::Game(GLuint width, GLuint height)
     : Width(width), Height(height) {
 
+}
+
+std::string Game::getGamePath() {
+    return gamePath;
 }
 
 void Game::Init() {
@@ -45,9 +50,15 @@ void Game::Init() {
 
     spriteRenderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
-    world = SceneLoader::loadScene(gamePath + "scenes/" + configJSON["conf"]["mainScene"].get<std::string>());
+    world = SceneLoader::loadScene(gamePath + "scenes/" + configJSON["conf"]["mainScene"].get<std::string>(), this);
 
     world->setCameraActive(SceneLoader::getCamera());
+
+    lState = SceneLoader::getState();
+
+    for(int i = 0; i < lState.size(); i++) {
+        LuaReflection::CallFunctionFromScript(lState.at(i), "init");
+    }
 }
 
 void Game::Render() {
@@ -58,6 +69,10 @@ void Game::ProcessInput(GLfloat dt) {}
 
 void Game::Update() {
     world->CheckCollision();
+
+    for(int i = 0; i < lState.size(); i++) {
+        LuaReflection::CallFunctionFromScript(lState.at(i), "update");
+    }
 };
 
 void Game::Fixed_Update(GLfloat delta) {

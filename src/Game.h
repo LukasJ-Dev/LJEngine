@@ -10,7 +10,10 @@
 #include <nlohmann/json.hpp>
 
 class Game {
+private:
+    std::string gamePath = "Games/testGame/";
 public:
+    std::string getGamePath();
     GLuint Width, Height;
     Game(GLuint width, GLuint height);
     void Init();

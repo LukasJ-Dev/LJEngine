@@ -15,10 +15,11 @@ GameObject::GameObject()
 GameObject::GameObject(glm::vec2 Position, glm::vec2 Scale, GLfloat Rotation, std::string GameObjectType)
     : localPosition(Position), Scale(Scale), Rotation(Rotation), GameObjectType(GameObjectType), globalPosition(Position) {}
 
-void GameObject::attachChild(GameObject *child) {
+GameObject* GameObject::attachChild(GameObject *child) {
     children.push_back(child);
     child->setScene(scene);
     child->setParent(this);
+    return child;
 }
 
 void GameObject::setParent(GameObject *parent) {
